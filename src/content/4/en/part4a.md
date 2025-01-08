@@ -101,10 +101,12 @@ The contents of the <i>notes.js</i> module are the following:
 ```js
 const notesRouter = require('express').Router()
 const Note = require('../models/note')
+const mongoose = require('mongoose')
 
 notesRouter.get('/', (request, response) => {
   Note.find({}).then(notes => {
     response.json(notes)
+    mongoose.connection.close()
   })
 })
 
@@ -116,6 +118,7 @@ notesRouter.get('/:id', (request, response, next) => {
       } else {
         response.status(404).end()
       }
+      mongoose.connection.close()
     })
     .catch(error => next(error))
 })
@@ -131,6 +134,7 @@ notesRouter.post('/', (request, response, next) => {
   note.save()
     .then(savedNote => {
       response.json(savedNote)
+      mongoose.connection.close()
     })
     .catch(error => next(error))
 })
@@ -139,6 +143,7 @@ notesRouter.delete('/:id', (request, response, next) => {
   Note.findByIdAndDelete(request.params.id)
     .then(() => {
       response.status(204).end()
+      mongoose.connection.close()
     })
     .catch(error => next(error))
 })
@@ -154,6 +159,7 @@ notesRouter.put('/:id', (request, response, next) => {
   Note.findByIdAndUpdate(request.params.id, note, { new: true })
     .then(updatedNote => {
       response.json(updatedNote)
+      mongoose.connection.close()
     })
     .catch(error => next(error))
 })
